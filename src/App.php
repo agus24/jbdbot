@@ -8,55 +8,198 @@ use Log\Log;
 
 class App
 {
-    public $log;
+    private $log;
+    private $channelAccessToken;
+    private $channelSecret;
 
-    public function __construct()
+    public function __construct($channelAccessToken, $channelSecret)
     {
         $this->log = Log::instance();
+        $this->channelAccessToken = $channelAccessToken;
+        $this->channelSecret = $channelSecret;
     }
 
-    public static function init() {
-        return new static;
-    }
-
-    public static function run()
+    public function run()
     {
-        $app = new static;
-        $log = Log::instance();
-        $httpClient = new CurlHTTPClient('+tShab+/Xdwua1X9VLKEbKkqnVyb20zqeUhH+7YcPQe5n9LqE8d9xO0zKoLcqXG2M6ClqxT12EQh3iHew2nNcer/G2nc4t2To9JrjYKFwQZvLw8R6AiMsYSWCNU5v/lk+wTUAIXi/XecfVt9FjxzyQdB04t89/1O/w1cDnyilFU=');
-        $bot = new LINEBot($httpClient, ['channelSecret' => 'c51ade180370b4a509f9029d22c1a5e1']);
-        $app->log->info('a');
-        $app->pushMessage("woi");
+        $bot = new Bot($this->channelAccessToken, $this->channelSecret);
+
+        $userId     = $bot->parseEvents()[0]['source']['userId'];
+        $replyToken = $bot->parseEvents()[0]['replyToken'];
+        $timestamp  = $bot->parseEvents()[0]['timestamp'];
+
+
+        $message    = $bot->parseEvents()[0]['message'];
+        $messageid  = $bot->parseEvents()[0]['message']['id'];
+
+        $profil = $bot->profil($userId);
+
+        $pesan_datang = $message['text'];
+
+
+    //pesan bergambar
+    if($message['type']=='text')
+    {
+        if($pesan_datang=='1')
+        {
+
+
+            $balas = array(
+                                'replyToken' => $replyToken,
+                                'messages' => array(
+                                    array(
+                                            'type' => 'text',
+                                            'text' => 'Halo '.$profil->displayName.', Anda memilih menu 1,'
+                                        )
+                                )
+                            );
+
+        }
+        else
+        if($pesan_datang=='2')
+        {
+            $get_sub = array();
+            $aa =   array(
+                            'type' => 'image',
+                            'originalContentUrl' => 'https://medantechno.com/line/images/bolt/1000.jpg',
+                            'previewImageUrl' => 'https://medantechno.com/line/images/bolt/240.jpg'
+
+                        );
+            array_push($get_sub,$aa);
+
+            $get_sub[] = array(
+                                        'type' => 'text',
+                                        'text' => 'Halo '.$profil->displayName.', Anda memilih menu 2, harusnya gambar muncul.'
+                                    );
+
+            $balas = array(
+                        'replyToken'    => $replyToken,
+                        'messages'      => $get_sub
+                     );
+            /*
+            $alt = array(
+                                'replyToken' => $replyToken,
+                                'messages' => array(
+                                    array(
+                                            'type' => 'text',
+                                            'text' => 'Anda memilih menu 2, harusnya gambar muncul.'
+                                        )
+                                )
+                            );
+            */
+            //$client->replyMessage($alt);
+        }
+        else
+        if($pesan_datang=='3')
+        {
+
+            $balas = array(
+                                'replyToken' => $replyToken,
+                                'messages' => array(
+                                    array(
+                                            'type' => 'text',
+                                            'text' => 'Fungsi PHP base64_encode medantechno.com :'. base64_encode("medantechno.com")
+                                        )
+                                )
+                            );
+
+        }
+        else
+        if($pesan_datang=='4')
+        {
+
+            $balas = array(
+                                'replyToken' => $replyToken,
+                                'messages' => array(
+                                    array(
+                                            'type' => 'text',
+                                            'text' => 'Jam Server Saya : '. date('Y-m-d H:i:s')
+                                        )
+                                )
+                            );
+
+        }
+        else
+        if($pesan_datang=='6')
+        {
+
+            $balas = array(
+                                'replyToken' => $replyToken,
+                                'messages' => array(
+                                    array(
+                                            'type' => 'location',
+                                            'title' => 'Lokasi Saya.. Klik Detail',
+                                            'address' => 'Medan',
+                                            'latitude' => '3.521892',
+                                            'longitude' => '98.623596'
+                                        )
+                                )
+                            );
+
+        }
+        else
+        if($pesan_datang=='7')
+        {
+
+            $balas = array(
+                                'replyToken' => $replyToken,
+                                'messages' => array(
+                                    array(
+                                            'type' => 'text',
+                                            'text' => 'Testing PUSH pesan ke anda'
+                                        )
+                                )
+                            );
+
+            $push = array(
+                                'to' => $userId,
+                                'messages' => array(
+                                    array(
+                                            'type' => 'text',
+                                            'text' => 'Pesan ini dari medantechno.com'
+                                        )
+                                )
+                            );
+
+
+            $client->pushMessage($push);
+
+        }
+
+        else{
+
+            $balas = array(
+                                'replyToken' => $replyToken,
+                                'messages' => array(
+                                    array(
+                                            'type' => 'text',
+                                            'text' => 'Halo.. Selamat datang di medantechno.com .        Untuk testing menu pilih 1,2,3,4,5 ... atau stiker'
+                                        )
+                                )
+                            );
+
+        }
+
+    }else if($message['type']=='sticker')
+    {
+        $balas = array(
+                                'replyToken' => $replyToken,
+                                'messages' => array(
+                                    array(
+                                            'type' => 'text',
+                                            'text' => 'Terimakasih stikernya... '
+
+                                        )
+                                )
+                            );
+
     }
 
-    private function exec_url($fullurl,$channelAccessToken,$message)
-    {
+    $result =  json_encode($balas);
+    //$result = ob_get_clean();
 
-        $header = array(
-            "Content-Type: application/json",
-            'Authorization: Bearer '.$channelAccessToken,
-        );
+    file_put_contents('./balasan.json',$result);
 
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_VERBOSE, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_POST,           1 );
-        curl_setopt($ch, CURLOPT_POSTFIELDS,     $message);
-        curl_setopt($ch, CURLOPT_FAILONERROR, 0);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_URL, $fullurl);
-
-        $returned =  curl_exec($ch);
-
-        return($returned);
-    }
-
-    public function pushMessage($message)
-    {
-        $response = exec_url('https://api.line.me/v2/bot/message/push',$this->channelAccessToken,json_encode($message));
+    $client->replyMessage($balas);
     }
 }

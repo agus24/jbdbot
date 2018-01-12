@@ -6,7 +6,15 @@
             "email": "agusx244@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+          "Log\\": "log",
+          "App\\": "src"
+        }
+    },
     "require": {
-        "linecorp/line-bot-sdk": "^2.3"
+        "linecorp/line-bot-sdk": "^2.3",
+        "monolog/monolog": "^1.23",
+        "symfony/var-dumper": "^4.0"
     }
 }
